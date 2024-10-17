@@ -1,0 +1,37 @@
+name: Auto sync Branches
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 2 * * *'  # 8:00 AM IST (2:30 AM UTC)
+    - cron: '30 11 * * *' # 5:00 PM IST (11:30 AM UTC)
+
+jobs:
+  merge_develop_to_BR_Phase2:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Fetch full history for proper merging
+
+      # Step 2: Set up Git user for commits
+      - name: Set up Git user
+        run: |
+          git config --global user.name "manasa-syama"
+          git config --global user.email manasa.syama@gmail.com
+      # Step 3: Fetch all branches from the remote
+      - name: Fetch all branches
+        run: git fetch --all
+
+      # Step 4: Checkout BR_Phase2 branch
+      - name: Checkout BR_Phase2
+        run: git checkout BR_Phase2
+
+      # Step 5: Merge origin/develop into BR_Phase2
+      - name: Merge origin/develop into BR_Phase2
+        run: |
+          git merge origin/develop
+          git push origin BR_Phase2
