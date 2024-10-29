@@ -44,7 +44,7 @@ jobs:
         run: |
           if [ "${{ env.branch_exists }}" == "true" ]; then
            echo "*****sa_test exists*****"
-            # git reset --hard origin/source1  # Reset temp1 to the latest from source1
+           git reset --hard origin/source1  # Reset temp1 to the latest from source1
           else
             git checkout -b sa_test origin/source1  # Create a new temp1 branch
             # git add .
