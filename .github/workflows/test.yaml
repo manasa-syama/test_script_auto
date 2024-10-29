@@ -21,14 +21,33 @@ jobs:
           git config --global user.name "manasa-syama"
           git config --global user.email "manasa.syama@gmail.com"
 
-      - name: Fetch source1 branch
+      - name: Fetch branches
         run: |
           git fetch origin source1
-          git checkout -b temp2 origin/source1
+          git fetch origin target1
+
+      - name: Check for temp1 branch
+        id: check_temp_branch
+        run: |
+          if git show-ref --verify --quiet refs/heads/temp1; then
+            echo "temp1 branch exists."
+            echo "branch_exists=true" >> $GITHUB_ENV
+          else
+            echo "temp1 branch does not exist."
+            echo "branch_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create or reset temp1 branch
+        run: |
+          if [ "${{ env.branch_exists }}" = "true" ]; then
+            git checkout temp1
+            git reset --hard origin/source1  # Reset temp1 to the latest from source1
+          else
+            git checkout -b temp1 origin/source1  # Create a new temp1 branch
+          fi
 
       - name: Create temporary branch
         run: |
-          git checkout -b temp2
           git merge origin/source1 --no-commit --no-ff || echo "Merge failed"
 
       - name: Check for merge conflicts
@@ -41,7 +60,7 @@ jobs:
           else
             echo "No conflicts detected."
             echo "conflicts=false" >> $GITHUB_ENV
-            git commit -m "Merged source1 into temp2"
+            git commit -m "Merged source1 into temp1"
           fi
 
       - name: Sync to target1 (if no conflicts)
@@ -54,4 +73,4 @@ jobs:
       - name: Clean up temporary branch
         if: env.conflicts == 'false'
         run: |
-          git branch -D temp2
+          git branch -D temp1
