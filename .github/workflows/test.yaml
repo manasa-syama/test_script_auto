@@ -26,21 +26,21 @@ jobs:
           git fetch origin source1
           git fetch origin target1
 
-      - name: Check for temp1 branch
+      - name: Check for sa_test branch
         id: check_temp_branch
         run: |
-          if git show-ref --verify --quiet refs/heads/temp1; then
-            echo "temp1 branch exists."
+          if git show-ref --verify --quiet refs/heads/sa_test; then
+            echo "sa_test branch exists."
             echo "branch_exists=true" >> $ENV
           else
-            echo "temp1 branch does not exist."
+            echo "sa_test branch does not exist."
             echo "branch_exists=false" >> $ENV
           fi
 
-      - name: Create or reset temp1 branch
+      - name: Create or reset sa_test branch
         run: |
           if [ "${{ env.branch_exists }}" = "true" ]; then
-            git checkout temp1
+            git checkout sa_test
             git reset --hard origin/source1  # Reset temp1 to the latest from source1
           else
             git checkout -b temp1 origin/source1  # Create a new temp1 branch
@@ -60,17 +60,17 @@ jobs:
           else
             echo "No conflicts detected."
             echo "conflicts=false" >> $ENV
-            git commit -m "Merged source1 into temp1"
+            git commit -m "Merged source1 into sa_test"
           fi
 
       - name: Sync to target1 (if no conflicts)
         if: env.conflicts == 'false'
         run: |
           git checkout target1
-          git merge temp1
+          git merge sa_test
           git push origin target1
 
       - name: Clean up temporary branch
         if: env.conflicts == 'false'
         run: |
-          git branch -D temp1
+          git branch -D sa_test
