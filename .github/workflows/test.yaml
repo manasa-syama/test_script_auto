@@ -57,8 +57,18 @@ jobs:
         id: merge_operation
         run: |
           git checkout sa_test
-          output=$(git merge origin/source1 2>&1) || { echo "Merge failed. Output: $output"; exit 1; }
-          echo "Output valus is : $output"
+          output=$(git merge origin/source1 2>&1) || {
+            echo "Merge failed. Output: $output"
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               git merge --abort
+            fi
+            exit 1
+          }
+          echo "Merge successful!"
+          git push origin sa_test
+          # output=$(git merge origin/source1 2>&1) || { echo "Merge failed. Output: $output"; exit 1; }
+          # echo "Output valus is : $output"
 
           # Check if the merge was successful
           # if [[ $? -ne 0 ]]; then
