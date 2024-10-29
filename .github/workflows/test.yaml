@@ -48,6 +48,7 @@ jobs:
             git checkout -b sa_test origin/source1  # Create a new temp1 branch
             # git add .
             # git commit -m "Created new branch sa_test"
+            git pull
             git push origin sa_test
           fi
 
