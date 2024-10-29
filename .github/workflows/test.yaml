@@ -60,7 +60,7 @@ jobs:
           else
             echo "No conflicts detected."
             echo "conflicts=false" >> $GITHUB_ENV
-            git commit -m "Merged source1 into sa_test"
+            # git commit -m "Merged source1 into sa_test"
           fi
 
       - name: Sync to target1 (if no conflicts)
