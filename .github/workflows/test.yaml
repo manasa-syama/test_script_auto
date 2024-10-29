@@ -57,9 +57,25 @@ jobs:
         id: merge_operation
         run: |
           git checkout sa_test
-          output=$(git merge origin/source1 2>&1)
-          exit_code=$?  # Capture the exit code right after the command
-          echo "Exit Code is : $exit_code"
+          # Merge operation using a subshell
+          if output=$(git merge origin/source1 2>&1); then
+            echo "Merge successful!"
+            # Optionally push changes if needed
+            git push origin sa_test
+          else
+            echo "Error: $output"  # Output from the failed command
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               git merge --abort  # Abort the merge if there are conflicts
+           else
+              echo "An error occurred during the merge (not a conflict)."
+           fi
+           exit 1  # Exit with an error code
+          fi
+
+          # output=$(git merge origin/source1 2>&1)
+          # exit_code=$?  # Capture the exit code right after the command
+          # echo "Exit Code is : $exit_code"
 
           # output=$(git merge origin/source1 2>&1) || {
           #   echo "Merge failed. Output: $output"
