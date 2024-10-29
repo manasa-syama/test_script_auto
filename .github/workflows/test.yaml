@@ -63,14 +63,14 @@ jobs:
             git commit -m "Merged source1 into sa_test"
           fi
 
-      # - name: Sync to target1 (if no conflicts)
-      #   if: env.conflicts == 'false'
-      #   run: |
-      #     git checkout target1
-      #     git merge sa_test
-      #     git push origin target1
+      - name: Sync to target1 (if no conflicts)
+        if: env.conflicts == 'false'
+        run: |
+          git checkout target1
+          git merge sa_test
+          git push origin target1
 
-      # - name: Clean up temporary branch
-      #   if: env.conflicts == 'false'
-      #   run: |
-      #     git branch -D sa_test
+      - name: Clean up temporary branch
+        if: env.conflicts == 'false'
+        run: |
+          git branch -D sa_test
