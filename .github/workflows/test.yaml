@@ -5,6 +5,8 @@ on:
     branches:
       - source1  # Trigger on pushes to source1
   workflow_dispatch:  # Allows manual triggering of the workflow
+permissions:
+  contents: write
 
 jobs:
   sync:
