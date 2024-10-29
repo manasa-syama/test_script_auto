@@ -57,7 +57,7 @@ jobs:
         id: merge_operation
         run: |
           git checkout sa_test
-          output=$(git merge origin/source1 2>&1)
+          output=$(git merge origin/source1 2>&1) || { echo "Merge failed. Output: $output"; exit 1; }
           echo $output
 
           # Check if the merge was successful
