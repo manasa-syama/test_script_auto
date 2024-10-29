@@ -56,8 +56,11 @@ jobs:
       - name: Merge operation
         run: |
           output=$(git merge origin/source1 --no-commit --no-ff 2>&1) || echo "Merge failed" >> $GITHUB_ENV
-          echo "merge_output=$output" >> $GITHUB_ENV
+          echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
 
+      - name: Show Merge Output
+        run:  echo "Merge Output:${{env.merge_output}}"
+        
       - name: Check for Merge Conflicts
         id: check_conflicts
         run: |
