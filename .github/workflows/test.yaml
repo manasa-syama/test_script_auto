@@ -80,6 +80,7 @@ jobs:
             echo "No conflicts detected."
             echo "conflicts=false" >> $GITHUB_ENV
             git commit -m "Merged source1 into sa_test"  # Commit the merge if no conflicts
+            git push origin $(git rev-parse --abbrev-ref HEAD)
           fi
 
       # - name: Sync to target1 (if no conflicts)
