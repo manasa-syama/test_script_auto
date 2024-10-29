@@ -66,81 +66,26 @@ jobs:
             exit 1
           }
           echo "Merge successful!"
-          git push origin sa_test
-          # output=$(git merge origin/source1 2>&1) || { echo "Merge failed. Output: $output"; exit 1; }
-          # echo "Output valus is : $output"
-
-          # Check if the merge was successful
-          # if [[ $? -ne 0 ]]; then
-          #   echo "Merge failed. Output:"
-          #   echo "$output"
-          #   if echo "$output" | grep -q "CONFLICT"; then
-          #      echo "Merge conflicts detected. Please resolve them."
-          #      # Optional: Abort the merge
-          #      git merge --abort
-          #      exit 1
-          #   fi
-          # else
-          #    echo "Merge successful!"
-          #    # Push the changes if needed
-          #    git push origin sa_test
-          # fi
-        
-          # git merge origin/source1
-          # if [ $? -ne 0 ]; then
-          #  echo "Merge failed: $output"
-          #  echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
-          #  exit 1  # Exit with an error code to stop the workflow
-          # fi
-         
+          git push origin sa_test               
           
-      # - name: Display merge output
-      #   run: echo "Merge output:${{ env.merge_output }}"    
-            
-      #       # Check for changes before committing
-      #       if [ -n "$(git status --porcelain)" ]; then
-      #         git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
-      #       else
-      #         echo "No changes to commit."
-      #       fi
-      #     fi
-
-      # - name: Push Changes
-      #   run: |
-      #     if [ "${{ env.merge_output }}" != "Merge failed" ]; then
-      #       git push origin HEAD:$(git rev-parse --abbrev-ref HEAD)
-      #     else
-      #       echo "Not pushing changes due to merge failure."
-      #     fi
-
-      # - name: Show Merge Output
-      #   run: echo "Merge Output:${{ env.merge_output }}"
+     
+      - name: Sync to target1 (if no conflicts)        
+        run: |
+          git checkout target1
+          output=$(git merge origin/source1 2>&1) || {
+            echo "Merge failed. Output: $output"
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               git merge --abort
+            fi
+            exit 1
+          }
+          echo "Merge successful!"
+          git push origin target1               
           
-      # - name: Show Merge Output
-      #   run:  echo "Merge Output:${{env.merge_output}}"
-        
-      # - name: Check for Merge Conflicts
-      #   id: check_conflicts
-      #   run: |
-      #     if git ls-files -u | grep -q .; then
-      #       echo "Merge conflicts detected."
-      #       echo "conflicts=true" >> $GITHUB_ENV
-      #       git merge --abort  # Abort the merge
-      #     else
-      #       echo "No conflicts detected."
-      #       echo "conflicts=false" >> $GITHUB_ENV
-      #       git commit -m "Merged source1 into sa_test"  # Commit the merge if no conflicts
-      #       git push origin $(git rev-parse --abbrev-ref HEAD)
-      #     fi
 
-      # - name: Sync to target1 (if no conflicts)
-      #   if: env.conflicts == 'false'
-      #   run: |
-      #     git checkout target1
-      #     git merge sa_test
-      #     git push origin target1
-
-      # - name: Clean up temporary branch
-      #   if: env.conflicts == 'false'
-      #   run: |
-      #     git branch -D sa_test
+      - name: Clean up temporary branch        
+        run: |
+          git branch -d sa_test  # Delete the local sa_test branch
+          git push origin --delete sa_test  # Delete the remote sa_test branch
+          echo "sa_test branch has been deleted."
