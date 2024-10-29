@@ -31,10 +31,10 @@ jobs:
         run: |
           if git show-ref --verify --quiet refs/heads/sa_test; then
             echo "sa_test branch exists."
-            echo "branch_exists=true" >> $ENV
+            echo "branch_exists=true" >> $EN
           else
             echo "sa_test branch does not exist."
-            echo "branch_exists=false" >> $ENV
+            echo "branch_exists=false" >> $EN
           fi
 
       - name: Create or reset sa_test branch
@@ -55,11 +55,11 @@ jobs:
         run: |
           if git ls-files -u | grep -q .; then
             echo "Merge conflicts detected."
-            echo "conflicts=true" >> $ENV
+            echo "conflicts=true" >> $EN
             git merge --abort  # Abort the merge
           else
             echo "No conflicts detected."
-            echo "conflicts=false" >> $ENV
+            echo "conflicts=false" >> $EN
             git commit -m "Merged source1 into sa_test"
           fi
 
