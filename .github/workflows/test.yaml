@@ -48,31 +48,31 @@ jobs:
             git checkout -b sa_test origin/source1  # Create a new temp1 branch
           fi
 
-      - name: Create temporary branch
-        run: |
-          git merge origin/source1 --no-commit --no-ff || echo "Merge failed"
+      # - name: Create temporary branch
+      #   run: |
+      #     git merge origin/source1 --no-commit --no-ff || echo "Merge failed"
 
-      - name: Check for merge conflicts
-        id: check_conflicts
-        run: |
-          if git ls-files -u | grep -q .; then
-            echo "Merge conflicts detected."
-            echo "conflicts=true" >> $GITHUB_ENV
-            git merge --abort  # Abort the merge
-          else
-            echo "No conflicts detected."
-            echo "conflicts=false" >> $GITHUB_ENV
-            # git commit -m "Merged source1 into sa_test"
-          fi
+      # - name: Check for merge conflicts
+      #   id: check_conflicts
+      #   run: |
+      #     if git ls-files -u | grep -q .; then
+      #       echo "Merge conflicts detected."
+      #       echo "conflicts=true" >> $GITHUB_ENV
+      #       git merge --abort  # Abort the merge
+      #     else
+      #       echo "No conflicts detected."
+      #       echo "conflicts=false" >> $GITHUB_ENV
+      #       # git commit -m "Merged source1 into sa_test"
+      #     fi
 
-      - name: Sync to target1 (if no conflicts)
-        if: env.conflicts == 'false'
-        run: |
-          git checkout target1
-          git merge sa_test
-          git push origin target1
+      # - name: Sync to target1 (if no conflicts)
+      #   if: env.conflicts == 'false'
+      #   run: |
+      #     git checkout target1
+      #     git merge sa_test
+      #     git push origin target1
 
-      - name: Clean up temporary branch
-        if: env.conflicts == 'false'
-        run: |
-          git branch -D sa_test
+      # - name: Clean up temporary branch
+      #   if: env.conflicts == 'false'
+      #   run: |
+      #     git branch -D sa_test
