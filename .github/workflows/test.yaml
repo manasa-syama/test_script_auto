@@ -58,11 +58,11 @@ jobs:
         run: |
           git checkout sa_test
           git merge origin/source1
-          # if [ $? -ne 0 ]; then
-          #  echo "Merge failed: $output"
-          #  echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
-          #  exit 1  # Exit with an error code to stop the workflow
-          # fi
+          if [ $? -ne 0 ]; then
+           echo "Merge failed: $output"
+           echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+           exit 1  # Exit with an error code to stop the workflow
+          fi
          
           
       # - name: Display merge output
