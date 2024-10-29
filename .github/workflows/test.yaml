@@ -53,11 +53,19 @@ jobs:
             git push origin sa_test
           fi
 
-      - name: Merge operation
+      - name: Merge Operation
+        id: merge_operation
         run: |
-          output=$(git merge origin/source1 --no-commit --no-ff 2>&1) || echo "Merge failed" >> $GITHUB_ENV
-          echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
-
+          output=$(git merge origin/source1 --no-commit --no-ff 2>&1) 
+          if [ $? -ne 0 ]; then
+            echo "Merge failed" >> $GITHUB_ENV
+            echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+          else
+            echo "Merge successful"
+            echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+            git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
+          fi
+          
       - name: Show Merge Output
         run:  echo "Merge Output:${{env.merge_output}}"
         
