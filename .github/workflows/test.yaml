@@ -63,25 +63,42 @@ jobs:
           else
             echo "Merge successful"
             echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
-            git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
+            
+            # Check for changes before committing
+            if [ -n "$(git status --porcelain)" ]; then
+              git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
+            else
+              echo "No changes to commit."
+            fi
           fi
-          
-      - name: Show Merge Output
-        run:  echo "Merge Output:${{env.merge_output}}"
-        
-      - name: Check for Merge Conflicts
-        id: check_conflicts
+
+      - name: Push Changes
         run: |
-          if git ls-files -u | grep -q .; then
-            echo "Merge conflicts detected."
-            echo "conflicts=true" >> $GITHUB_ENV
-            git merge --abort  # Abort the merge
+          if [ "${{ env.merge_output }}" != "Merge failed" ]; then
+            git push origin HEAD:$(git rev-parse --abbrev-ref HEAD)
           else
-            echo "No conflicts detected."
-            echo "conflicts=false" >> $GITHUB_ENV
-            git commit -m "Merged source1 into sa_test"  # Commit the merge if no conflicts
-            git push origin $(git rev-parse --abbrev-ref HEAD)
+            echo "Not pushing changes due to merge failure."
           fi
+
+      - name: Show Merge Output
+        run: echo "Merge Output:${{ env.merge_output }}"
+          
+      # - name: Show Merge Output
+      #   run:  echo "Merge Output:${{env.merge_output}}"
+        
+      # - name: Check for Merge Conflicts
+      #   id: check_conflicts
+      #   run: |
+      #     if git ls-files -u | grep -q .; then
+      #       echo "Merge conflicts detected."
+      #       echo "conflicts=true" >> $GITHUB_ENV
+      #       git merge --abort  # Abort the merge
+      #     else
+      #       echo "No conflicts detected."
+      #       echo "conflicts=false" >> $GITHUB_ENV
+      #       git commit -m "Merged source1 into sa_test"  # Commit the merge if no conflicts
+      #       git push origin $(git rev-parse --abbrev-ref HEAD)
+      #     fi
 
       # - name: Sync to target1 (if no conflicts)
       #   if: env.conflicts == 'false'
