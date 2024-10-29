@@ -18,8 +18,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+          git config --global user.name "manasa-syama"
+          git config --global user.email "manasa.syama@gmail.com"
 
       - name: Fetch source1 branch
         run: |
