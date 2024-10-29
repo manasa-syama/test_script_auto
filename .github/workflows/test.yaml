@@ -61,7 +61,7 @@ jobs:
           
           if [ $? -ne 0 ]; then
             echo "Merge failed" >> $GITHUB_ENV
-            echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+            # echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
           else
             echo "Merge successful"
             # echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
