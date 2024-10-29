@@ -53,11 +53,12 @@ jobs:
             git push origin sa_test
           fi
 
-      - name: Create temporary branch
+      - name: Merge operation
         run: |
-          git merge origin/source1 --no-commit --no-ff || echo "Merge failed"
+          output=$(git merge origin/source1 --no-commit --no-ff 2>&1) || echo "Merge failed" >> $GITHUB_ENV
+          echo "merge_output=$output" >> $GITHUB_ENV
 
-      - name: Check for merge conflicts
+      - name: Check for Merge Conflicts
         id: check_conflicts
         run: |
           if git ls-files -u | grep -q .; then
@@ -67,7 +68,7 @@ jobs:
           else
             echo "No conflicts detected."
             echo "conflicts=false" >> $GITHUB_ENV
-            # git commit -m "Merged source1 into sa_test"
+            git commit -m "Merged source1 into sa_test"  # Commit the merge if no conflicts
           fi
 
       # - name: Sync to target1 (if no conflicts)
