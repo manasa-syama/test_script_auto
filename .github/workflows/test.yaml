@@ -57,31 +57,33 @@ jobs:
         id: merge_operation
         run: |
           output=$(git merge origin/source1 --no-commit --no-ff 2>&1) 
-          if [ $? -ne 0 ]; then
-            echo "Merge failed" >> $GITHUB_ENV
-            echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
-          else
-            echo "Merge successful"
-            echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+          exit_code=$?
+          echo "Merge state: $exit_code"
+      #     if [ $? -ne 0 ]; then
+      #       echo "Merge failed" >> $GITHUB_ENV
+      #       echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+      #     else
+      #       echo "Merge successful"
+      #       echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
             
-            # Check for changes before committing
-            if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
-            else
-              echo "No changes to commit."
-            fi
-          fi
+      #       # Check for changes before committing
+      #       if [ -n "$(git status --porcelain)" ]; then
+      #         git commit -m "Merged origin/source1 into $(git rev-parse --abbrev-ref HEAD)"
+      #       else
+      #         echo "No changes to commit."
+      #       fi
+      #     fi
 
-      - name: Push Changes
-        run: |
-          if [ "${{ env.merge_output }}" != "Merge failed" ]; then
-            git push origin HEAD:$(git rev-parse --abbrev-ref HEAD)
-          else
-            echo "Not pushing changes due to merge failure."
-          fi
+      # - name: Push Changes
+      #   run: |
+      #     if [ "${{ env.merge_output }}" != "Merge failed" ]; then
+      #       git push origin HEAD:$(git rev-parse --abbrev-ref HEAD)
+      #     else
+      #       echo "Not pushing changes due to merge failure."
+      #     fi
 
-      - name: Show Merge Output
-        run: echo "Merge Output:${{ env.merge_output }}"
+      # - name: Show Merge Output
+      #   run: echo "Merge Output:${{ env.merge_output }}"
           
       # - name: Show Merge Output
       #   run:  echo "Merge Output:${{env.merge_output}}"
