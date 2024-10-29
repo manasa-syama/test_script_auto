@@ -31,10 +31,10 @@ jobs:
         run: |
           if git show-ref --verify --quiet refs/heads/temp1; then
             echo "temp1 branch exists."
-            echo "branch_exists=true" >> $GITHUB_ENV
+            echo "branch_exists=true" >> $ENV
           else
             echo "temp1 branch does not exist."
-            echo "branch_exists=false" >> $GITHUB_ENV
+            echo "branch_exists=false" >> $ENV
           fi
 
       - name: Create or reset temp1 branch
@@ -55,11 +55,11 @@ jobs:
         run: |
           if git ls-files -u | grep -q .; then
             echo "Merge conflicts detected."
-            echo "conflicts=true" >> $GITHUB_ENV
+            echo "conflicts=true" >> $ENV
             git merge --abort  # Abort the merge
           else
             echo "No conflicts detected."
-            echo "conflicts=false" >> $GITHUB_ENV
+            echo "conflicts=false" >> $ENV
             git commit -m "Merged source1 into temp1"
           fi
 
