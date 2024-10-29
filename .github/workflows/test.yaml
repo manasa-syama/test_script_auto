@@ -57,7 +57,25 @@ jobs:
         id: merge_operation
         run: |
           git checkout sa_test
-          git merge origin/source1
+          output=$(git merge origin/source1 2>&1)
+
+          # Check if the merge was successful
+          if [[ $? -ne 0 ]]; then
+            echo "Merge failed. Output:"
+            echo "$output"
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               # Optional: Abort the merge
+               git merge --abort
+               exit 1
+            fi
+          else
+             echo "Merge successful!"
+             # Push the changes if needed
+             git push origin sa_test
+          fi
+        
+          # git merge origin/source1
           # if [ $? -ne 0 ]; then
           #  echo "Merge failed: $output"
           #  echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
