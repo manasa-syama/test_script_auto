@@ -58,6 +58,7 @@ jobs:
         run: |
           git checkout sa_test
           output=$(git merge origin/source1 2>&1)
+          echo $output
 
           # Check if the merge was successful
           # if [[ $? -ne 0 ]]; then
