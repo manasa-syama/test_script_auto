@@ -31,7 +31,8 @@ jobs:
       - name: Check for sa_test branch
         id: check_temp_branch
         run: |
-          if git show-ref --verify --quiet refs/heads/sa_test; then
+          git fetch origin
+          if git show-ref --verify --quiet refs/remotes/origin/sa_test; then
             echo "sa_test branch exists."
             echo "branch_exists=true" >> $GITHUB_ENV
           else
