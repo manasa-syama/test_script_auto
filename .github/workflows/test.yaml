@@ -64,6 +64,9 @@ jobs:
            exit 1  # Exit with an error code to stop the workflow
           fi
           echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
+          
+      - name: Display merge output
+        run: echo "Merge output:${{ env.merge_output }}"    
             
       #       # Check for changes before committing
       #       if [ -n "$(git status --porcelain)" ]; then
