@@ -57,7 +57,7 @@ jobs:
         id: merge_operation
         run: |
           git fetch origin
-          git checkout sa_test
+          git checkout origin/sa_test
           output=$(git merge origin/source1) 
           git status
           exit_code=$?
