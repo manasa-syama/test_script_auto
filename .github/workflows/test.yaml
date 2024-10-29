@@ -57,7 +57,7 @@ jobs:
         id: merge_operation
         run: |
           git checkout sa_test
-          output=$(git merge origin/source1 2>&1)
+          git merge origin/source1 2>&1
           # if [ $? -ne 0 ]; then
           #  echo "Merge failed: $output"
           #  echo "merge_output=${output//$'\n'/\\n}" >> $GITHUB_ENV
