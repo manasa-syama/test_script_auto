@@ -24,7 +24,7 @@ jobs:
       - name: Fetch source1 branch
         run: |
           git fetch origin source1
-          git checkout -b temp1 origin/source1
+          git checkout -b temp2 origin/source1
 
       - name: Create temporary branch
         run: |
