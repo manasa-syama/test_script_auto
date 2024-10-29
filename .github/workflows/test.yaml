@@ -28,7 +28,7 @@ jobs:
 
       - name: Create temporary branch
         run: |
-          git checkout -b temp1
+          git checkout -b temp2
           git merge origin/source1 --no-commit --no-ff || echo "Merge failed"
 
       - name: Check for merge conflicts
@@ -41,7 +41,7 @@ jobs:
           else
             echo "No conflicts detected."
             echo "conflicts=false" >> $GITHUB_ENV
-            git commit -m "Merged source1 into temp1"
+            git commit -m "Merged source1 into temp2"
           fi
 
       - name: Sync to target1 (if no conflicts)
@@ -54,4 +54,4 @@ jobs:
       - name: Clean up temporary branch
         if: env.conflicts == 'false'
         run: |
-          git branch -D temp1
+          git branch -D temp2
