@@ -1,9 +1,9 @@
 name: Auto Sync Branch
 
 on:
-  push:
-    branches:
-      - source1  # Trigger on pushes to source1
+  # push:
+  #   branches:
+  #     - source1  # Trigger on pushes to source1
   workflow_dispatch:  # Allows manual triggering of the workflow
 permissions:
   contents: write
@@ -46,7 +46,7 @@ jobs:
            echo "*****sa_test exists*****"
            git reset --hard origin/source1  # Reset temp1 to the latest from source1
           else
-            git checkout -b sa_test origin/source1  # Create a new temp1 branch
+            git checkout -b sa_test origin/target1  # Create a new temp1 branch
             # git add .
             # git commit -m "Created new branch sa_test"
             git pull
