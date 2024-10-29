@@ -65,8 +65,8 @@ jobs:
           # fi
          
           
-      - name: Display merge output
-        run: echo "Merge output:${{ env.merge_output }}"    
+      # - name: Display merge output
+      #   run: echo "Merge output:${{ env.merge_output }}"    
             
       #       # Check for changes before committing
       #       if [ -n "$(git status --porcelain)" ]; then
