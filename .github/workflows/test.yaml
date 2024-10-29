@@ -41,7 +41,7 @@ jobs:
 
       - name: Create or reset sa_test branch
         run: |
-          if [ "${{ GITHUB_ENV.branch_exists }}" = "true" ]; then
+          if [ "$GITHUB_ENV.branch_exists" = "true" ]; then
             git checkout sa_test
             # git reset --hard origin/source1  # Reset temp1 to the latest from source1
           else
