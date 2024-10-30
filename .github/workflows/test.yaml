@@ -4,7 +4,9 @@ on:
   # push:
   #   branches:
   #     - source1  # Trigger on pushes to source1
-  workflow_dispatch:  # Allows manual triggering of the workflow
+  workflow_dispatch:
+  schedule:
+    - cron: '*/5 * * * *' 
 permissions:
   contents: write
 
