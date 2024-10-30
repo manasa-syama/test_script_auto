@@ -1,1 +1,105 @@
 
+name: Auto Sync Branch
+
+on:
+  # push:
+  #   branches:
+  #     - source1  # Trigger on pushes to source1
+  workflow_dispatch:  # Allows manual triggering of the workflow
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: develop  # Checkout the develop branch where the workflow file resides
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "manasa-syama"
+          git config --global user.email "manasa.syama@gmail.com"
+
+      - name: Fetch branches
+        run: |
+          git fetch origin source2
+          git fetch origin target2
+
+      - name: Check for sa_test2 branch
+        id: check_temp_branch
+        run: |
+          git fetch origin
+          if git show-ref --verify --quiet refs/remotes/origin/sa_test2; then
+            echo "sa_test2 branch exists."
+            echo "branch_exists=true" >> $GITHUB_ENV
+          else
+            echo "sa_test2 branch does not exist."
+            echo "branch_exists=false" >> $GITHUB_ENV
+          fi
+
+      - name: Create or reset sa_test2 branch
+        run: |
+          if [ "${{ env.branch_exists }}" == "true" ]; then
+           echo "*****sa_test2 branch exists*****"
+           git reset --hard origin/target2  # Reset temp1 to the latest from source1
+          else
+            git checkout -b sa_test2 origin/target2  # Create a new temp1 branch
+            # git add .
+            # git commit -m "Created new branch sa_test"
+            # git pull
+            git push origin sa_test2
+          fi
+
+      - name: Merge Operation
+        id: merge_operation_sa_test2
+        run: |
+          git checkout sa_test2
+          git fetch origin 
+          # Merge operation using a subshell
+          if output=$(git merge origin/source2 2>&1); then
+            echo "Merge successful!"
+            # Optionally push changes if needed
+            git push origin sa_test2
+          else
+            echo "Error: $output"  # Output from the failed command
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               git merge --abort  # Abort the merge if there are conflicts
+           else
+              echo "An error occurred during the merge (not a conflict)."
+           fi
+           exit 1  # Exit with an error code
+          fi
+
+              
+      - name: Merge Operation on target2  
+        id: merge_operation_target2
+        run: |
+          git checkout target2
+          git fetch origin target2
+          # Merge operation using a subshell
+          if output=$(git merge origin/source2 2>&1); then
+            echo "Merge successful!"
+            # Optionally push changes if needed
+            git push origin target2 --force
+          else
+            echo "Error: $output"  # Output from the failed command
+            if echo "$output" | grep -q "CONFLICT"; then
+               echo "Merge conflicts detected. Please resolve them."
+               git merge --abort  # Abort the merge if there are conflicts
+           else
+              echo "An error occurred during the merge (not a conflict)."
+           fi
+           exit 1  # Exit with an error code
+          fi              
+          
+
+      - name: Clean up temporary branch        
+        run: |
+          git branch -D sa_test2  # Delete the local sa_test branch
+          git push origin --delete sa_test2  # Delete the remote sa_test branch
+          echo "sa_test branch has been deleted."
