@@ -3,6 +3,7 @@ name: Auto Sync Branch
 on:
   schedule:
     - cron: '*/5 * * * *'  # Every 5 minutes
+  workflow_dispatch:   
 
 permissions:
   contents: write
