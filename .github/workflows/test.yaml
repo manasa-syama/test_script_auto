@@ -42,15 +42,18 @@ jobs:
         id: check_temp_branch
         run: |
           git fetch origin
-          # Check if the branch exists without aborting the workflow
-          $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test
-          if ($LASTEXITCODE -ne 0) {
-          "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-          echo "branch_exists=false" >> $env:GITHUB_ENV
-          } else {
-           "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-           echo "branch_exists=true" >> $env:GITHUB_ENV
-          }
+          # Attempt to check for the branch and suppress errors
+          try {
+             git show-ref --verify --quiet refs/remotes/origin/sa_test
+             # If the branch exists
+             "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+             echo "branch_exists=true" >> $env:GITHUB_ENV
+          } catch {
+              # If the branch does not exist
+             "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+             echo "branch_exists=false" >> $env:GITHUB_ENV
+           }
+
 
       # - name: Check for sa_test branch
       #   id: check_temp_branch
