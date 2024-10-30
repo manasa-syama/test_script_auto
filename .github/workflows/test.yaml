@@ -78,6 +78,7 @@ jobs:
         id: merge_operation_target1
         run: |
           git checkout target1
+          git fetch origin target1
           # Merge operation using a subshell
           if output=$(git merge origin/source1 2>&1); then
             echo "Merge successful!"
