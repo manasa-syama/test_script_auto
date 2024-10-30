@@ -24,7 +24,7 @@ jobs:
           echo "::set-output name=log_file::$LOG_FILE"
 
       - name: Checkout develop branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           ref: develop  # Checkout the develop branch where the workflow file resides
 
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload log
         if: always()  # Ensures this step runs regardless of the outcome of previous steps
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sync-log
           path: ${{ steps.setup_log.outputs.log_file }}
