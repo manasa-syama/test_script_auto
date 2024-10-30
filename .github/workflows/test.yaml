@@ -2,7 +2,8 @@ name: Auto Sync Branch
 
 on:
   schedule:
-    - cron: '*/10 * * * *' 
+    - cron: '5 * * * *'  # 8:00 AM IST (2:30 AM UTC)
+    
   # push:
   #   branches:
   #     - source1  # Trigger on pushes to source1
