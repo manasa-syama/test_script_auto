@@ -2,8 +2,7 @@ name: Auto Sync Branch
 
 on:
   schedule:
-    - cron: '*/5 * * * *'  # 8:00 AM IST (2:30 AM UTC) 
-  workflow_dispatch:  
+    - cron: '*/5 * * * *'  # Every 5 minutes
 
 permissions:
   contents: write
@@ -17,7 +16,7 @@ jobs:
         id: setup_log
         run: |
           TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
-          LOG_FILE="sync_log_${TIMESTAMP}.txt"
+          LOG_FILE="member360_services_phase1to2_Sync_log_Dev_${TIMESTAMP}.log"
           echo "Log file created: $LOG_FILE" > $LOG_FILE
           echo "$(date) - Starting sync operation..." >> $LOG_FILE
           echo "::set-output name=log_file::$LOG_FILE"
