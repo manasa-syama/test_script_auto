@@ -107,6 +107,7 @@ jobs:
           "sa_test branch has been deleted." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
 
       - name: Upload log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: sync-log
