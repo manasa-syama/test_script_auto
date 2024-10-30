@@ -38,16 +38,15 @@ jobs:
           git fetch origin source1
           git fetch origin target1
 
-      - name: Check for sa_test branch
-        id: check_temp_branch
+      - name: Create or reset sa_test branch
         run: |
-          git fetch origin
-          if (git show-ref --verify --quiet refs/remotes/origin/sa_test) {
-            "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            "branch_exists=true" | Out-File $GITHUB_ENV -Append
+          if ($env:branch_exists -eq "true") {
+            "*****sa_test branch exists*****" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            git reset --hard origin/target1  # Reset sa_test to the latest from target1
           } else {
-            "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            "branch_exists=false" | Out-File $GITHUB_ENV -Append
+            git checkout -b sa_test origin/target1  # Create a new sa_test branch
+            git push origin sa_test
+            "Created new branch sa_test." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
           }
 
       - name: Create or reset sa_test branch
