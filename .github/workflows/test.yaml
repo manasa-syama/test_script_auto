@@ -70,7 +70,7 @@ jobs:
         id: merge_operation_sa_test
         run: |
           git checkout sa_test
-          git fetch origin
+          git fetch origin sa_test
           try {
             git merge origin/source1
             "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
@@ -81,12 +81,12 @@ jobs:
             if ($output -like "*CONFLICT*") {
               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
               git merge --abort
-              exit 1
+              
             } else {
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
               
             }
-           
+            exit 1
           }
           
 
