@@ -3,12 +3,7 @@ name: Auto Sync Branch
 on:
   schedule:
     - cron: '*/5 * * * *'  # 8:00 AM IST (2:30 AM UTC)
-    
-  # push:
-  #   branches:
-  #     - source1  # Trigger on pushes to source1
-  # workflow_dispatch:
-  
+
 permissions:
   contents: write
 
@@ -17,6 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up log file
+        id: setup_log
+        run: |
+          TIMESTAMP=$(date +'%Y%m%d_%H%M%S')
+          LOG_FILE="sync_log_${TIMESTAMP}.txt"
+          echo "Log file created: $LOG_FILE" > $LOG_FILE
+          echo "$(date) - Starting sync operation..." >> $LOG_FILE
+          echo "::set-output name=log_file::$LOG_FILE"
+
       - name: Checkout develop branch
         uses: actions/checkout@v2
         with:
@@ -37,72 +41,70 @@ jobs:
         run: |
           git fetch origin
           if git show-ref --verify --quiet refs/remotes/origin/sa_test; then
-            echo "sa_test branch exists."
+            echo "sa_test branch exists." >> ${{ steps.setup_log.outputs.log_file }}
             echo "branch_exists=true" >> $GITHUB_ENV
           else
-            echo "sa_test branch does not exist."
+            echo "sa_test branch does not exist." >> ${{ steps.setup_log.outputs.log_file }}
             echo "branch_exists=false" >> $GITHUB_ENV
           fi
 
       - name: Create or reset sa_test branch
         run: |
           if [ "${{ env.branch_exists }}" == "true" ]; then
-           echo "*****sa_test branch exists*****"
-           git reset --hard origin/target1  # Reset temp1 to the latest from source1
+            echo "*****sa_test branch exists*****" >> ${{ steps.setup_log.outputs.log_file }}
+            git reset --hard origin/target1  # Reset sa_test to the latest from target1
           else
-            git checkout -b sa_test origin/target1  # Create a new temp1 branch
-            # git add .
-            # git commit -m "Created new branch sa_test"
-            # git pull
+            git checkout -b sa_test origin/target1  # Create a new sa_test branch
             git push origin sa_test
+            echo "Created new branch sa_test." >> ${{ steps.setup_log.outputs.log_file }}
           fi
 
       - name: Merge Operation
         id: merge_operation_sa_test
         run: |
           git checkout sa_test
-          git fetch origin 
-          # Merge operation using a subshell
+          git fetch origin
           if output=$(git merge origin/source1 2>&1); then
-            echo "Merge successful!"
-            # Optionally push changes if needed
+            echo "Merge successful!" >> ${{ steps.setup_log.outputs.log_file }}
             git push origin sa_test
           else
-            echo "Error: $output"  # Output from the failed command
+            echo "Error: $output" >> ${{ steps.setup_log.outputs.log_file }}
             if echo "$output" | grep -q "CONFLICT"; then
-               echo "Merge conflicts detected. Please resolve them."
-               git merge --abort  # Abort the merge if there are conflicts
-           else
-              echo "An error occurred during the merge (not a conflict)."
-           fi
-           exit 1  # Exit with an error code
+               echo "Merge conflicts detected. Please resolve them." >> ${{ steps.setup_log.outputs.log_file }}
+               git merge --abort
+            else
+              echo "An error occurred during the merge (not a conflict)." >> ${{ steps.setup_log.outputs.log_file }}
+            fi
+            exit 1
           fi
 
-              
       - name: Merge Operation on target1  
         id: merge_operation_target1
         run: |
           git checkout target1
           git fetch origin target1
-          # Merge operation using a subshell
           if output=$(git merge origin/source1 2>&1); then
-            echo "Merge successful!"
-            # Optionally push changes if needed
+            echo "Merge successful!" >> ${{ steps.setup_log.outputs.log_file }}
             git push origin target1 --force
           else
-            echo "Error: $output"  # Output from the failed command
+            echo "Error: $output" >> ${{ steps.setup_log.outputs.log_file }}
             if echo "$output" | grep -q "CONFLICT"; then
-               echo "Merge conflicts detected. Please resolve them."
-               git merge --abort  # Abort the merge if there are conflicts
-           else
-              echo "An error occurred during the merge (not a conflict)."
-           fi
-           exit 1  # Exit with an error code
+               echo "Merge conflicts detected. Please resolve them." >> ${{ steps.setup_log.outputs.log_file }}
+               git merge --abort
+            else
+              echo "An error occurred during the merge (not a conflict)." >> ${{ steps.setup_log.outputs.log_file }}
+            fi
+            exit 1
           fi              
-          
 
       - name: Clean up temporary branch        
         run: |
           git branch -D sa_test  # Delete the local sa_test branch
           git push origin --delete sa_test  # Delete the remote sa_test branch
-          echo "sa_test branch has been deleted."
+          echo "sa_test branch has been deleted." >> ${{ steps.setup_log.outputs.log_file }}
+
+      - name: Upload log
+        uses: actions/upload-artifact@v2
+        with:
+          name: sync-log
+          path: ${{ steps.setup_log.outputs.log_file }}
