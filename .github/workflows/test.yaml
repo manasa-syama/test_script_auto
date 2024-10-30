@@ -1,12 +1,13 @@
 name: Auto Sync Branch
 
 on:
+  schedule:
+    - cron: '*/10 * * * *' 
   # push:
   #   branches:
   #     - source1  # Trigger on pushes to source1
   # workflow_dispatch:
-  schedule:
-    - cron: '*/2 * * * *' 
+  
 permissions:
   contents: write
 
