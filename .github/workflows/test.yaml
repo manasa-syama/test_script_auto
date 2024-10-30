@@ -71,24 +71,16 @@ jobs:
         run: |
           git checkout sa_test
           git fetch origin sa_test
-          try {
-            git merge origin/source1
-            "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            git push origin sa_test
-          } catch {
-            $output = $_.Exception.Message
-            "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            if ($output -like "*CONFLICT*") {
-              "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-              git merge --abort
-              
-            } else {
-              "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-              
+          git merge origin/source1
+          if ($LASTEXITCODE -ne 0) {
+           $output = "Merge failed with exit code $LASTEXITCODE."
+           "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+           throw "Aborting the workflow due to an error during merge."
+          } else {
+              "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+              git push origin sa_test
             }
-            throw "Aborting the workflow due to an error during merge."
-          }
-          
+         
 
       - name: Merge Operation on target1  
         id: merge_operation_target1
