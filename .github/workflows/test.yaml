@@ -43,7 +43,7 @@ jobs:
         run: |
           git fetch origin
           $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test
-
+          echo "EXIT-CODE: $LASTEXITCODE "
           if ($LASTEXITCODE -eq 0) {
             "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             echo "branch_exists=true" >> $env:GITHUB_ENV
