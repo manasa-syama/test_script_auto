@@ -17,11 +17,11 @@ jobs:
       - name: Set up log file
         id: setup_log
         run: |
-          $TIMESTAMP = Get-Date -Format 'yyyyMMdd_HHmmss'
+          $TIMESTAMP = (Get-Date).ToString('yyyyMMdd_HHmmss')
           $LOG_FILE = "member360_services_phase1to2_Sync_log_Dev_$TIMESTAMP.log"
           "Log file created: $LOG_FILE" | Out-File $LOG_FILE
           "$(Get-Date) - Starting sync operation..." | Out-File $LOG_FILE -Append
-          echo "log_file=$LOG_FILE" >> $GITHUB_ENV
+          echo "::set-output name=log_file::$LOG_FILE"
 
       - name: Checkout develop branch
         uses: actions/checkout@v2
