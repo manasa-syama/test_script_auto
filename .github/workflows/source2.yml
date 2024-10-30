@@ -1,5 +1,5 @@
 
-name: Auto Sync Branch
+name: Auto Sync Branch for test2
 
 on:
   # push:
