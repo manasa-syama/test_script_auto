@@ -105,7 +105,7 @@ jobs:
           echo "sa_test branch has been deleted." >> ${{ steps.setup_log.outputs.log_file }}
 
       - name: Upload log
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sync-log
           path: ${{ steps.setup_log.outputs.log_file }}
