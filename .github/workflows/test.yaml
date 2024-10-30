@@ -26,7 +26,7 @@ jobs:
       - name: Checkout develop branch
         uses: actions/checkout@v4
         with:
-          ref: develop  # Checkout the develop branch where the workflow file resides
+          ref: develop  # Checkout the develop branch
 
       - name: Set up Git
         run: |
@@ -42,40 +42,20 @@ jobs:
         id: check_temp_branch
         run: |
           git fetch origin
-
-          # Attempt to check if the sa_test branch exists
-           $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test
-           echo " Status of above command:$LASTEXITCODE"
+          $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test
 
           if ($LASTEXITCODE -eq 0) {
-          # If the branch exists
-           "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-           echo "branch_exists=true" >> $env:GITHUB_ENV
+            "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            echo "branch_exists=true" >> $env:GITHUB_ENV
           } else {
-              # If the branch does not exist
-             "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-             echo "branch_exists=false" >> $env:GITHUB_ENV
-             # Do not exit or throw an error; just continue
-           }
-
-
-
-      # - name: Check for sa_test branch
-      #   id: check_temp_branch
-      #   run: |
-      #     git fetch origin
-      #     if (git show-ref --verify --quiet refs/remotes/origin/sa_test) {
-      #       "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-      #       echo "branch_exists=true" >> $env:GITHUB_ENV
-      #     } else {
-      #       "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-      #       echo "branch_exists=false" >> $env:GITHUB_ENV
-      #     }
+            "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            echo "branch_exists=false" >> $env:GITHUB_ENV
+          }
 
       - name: Create or reset sa_test branch
         run: |
           if ($env:branch_exists -eq "true") {
-            "*****sa_test branch exists*****" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            "***** sa_test branch exists *****" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             git reset --hard origin/target1  # Reset sa_test to the latest from target1
           } else {
             git checkout -b sa_test origin/target1  # Create a new sa_test branch
@@ -88,10 +68,12 @@ jobs:
         run: |
           git checkout sa_test
           git fetch origin
-          if ($output = git merge origin/source1 2>&1) {
+          try {
+            git merge origin/source1
             "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             git push origin sa_test
-          } else {
+          } catch {
+            $output = $_.Exception.Message
             "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             if ($output -like "*CONFLICT*") {
               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
@@ -107,10 +89,12 @@ jobs:
         run: |
           git checkout target1
           git fetch origin target1
-          if ($output = git merge origin/source1 2>&1) {
+          try {
+            git merge origin/source1
             "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             git push origin target1 --force
-          } else {
+          } catch {
+            $output = $_.Exception.Message
             "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             if ($output -like "*CONFLICT*") {
               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
@@ -119,7 +103,7 @@ jobs:
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             }
             exit 1
-          }              
+          }
 
       - name: Clean up temporary branch        
         run: |
