@@ -38,15 +38,16 @@ jobs:
           git fetch origin source1
           git fetch origin target1
 
-      - name: Create or reset sa_test branch
+      - name: Check for sa_test branch
+        id: check_temp_branch
         run: |
-          if ($env:branch_exists -eq "true") {
-            "*****sa_test branch exists*****" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            git reset --hard origin/target1  # Reset sa_test to the latest from target1
+          git fetch origin
+          if (git show-ref --verify --quiet refs/remotes/origin/sa_test) {
+            "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            echo "branch_exists=true" >> $env:GITHUB_ENV
           } else {
-            git checkout -b sa_test origin/target1  # Create a new sa_test branch
-            git push origin sa_test
-            "Created new branch sa_test." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+            echo "branch_exists=false" >> $env:GITHUB_ENV
           }
 
       - name: Create or reset sa_test branch
@@ -65,15 +66,14 @@ jobs:
         run: |
           git checkout sa_test
           git fetch origin
-          $output = git merge origin/source1 2>&1
-          if ($LASTEXITCODE -eq 0) {
+          if ($output = git merge origin/source1 2>&1) {
             "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             git push origin sa_test
           } else {
             "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            if ($output -match "CONFLICT") {
-               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-               git merge --abort
+            if ($output -like "*CONFLICT*") {
+              "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+              git merge --abort
             } else {
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             }
@@ -85,15 +85,14 @@ jobs:
         run: |
           git checkout target1
           git fetch origin target1
-          $output = git merge origin/source1 2>&1
-          if ($LASTEXITCODE -eq 0) {
+          if ($output = git merge origin/source1 2>&1) {
             "Merge successful!" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             git push origin target1 --force
           } else {
             "Error: $output" | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            if ($output -match "CONFLICT") {
-               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-               git merge --abort
+            if ($output -like "*CONFLICT*") {
+              "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+              git merge --abort
             } else {
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             }
@@ -107,8 +106,8 @@ jobs:
           "sa_test branch has been deleted." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
 
       - name: Upload log
-        if: always()
-        uses: actions/upload-artifact@v4
+        if: always()  # Ensures this step runs regardless of the outcome of previous steps
+        uses: actions/upload-artifact@v2
         with:
           name: sync-log
           path: ${{ steps.setup_log.outputs.log_file }}
