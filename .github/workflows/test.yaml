@@ -42,13 +42,26 @@ jobs:
         id: check_temp_branch
         run: |
           git fetch origin
-          if (git show-ref --verify --quiet refs/remotes/origin/sa_test) {
-            "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-            echo "branch_exists=true" >> $env:GITHUB_ENV
-          } else {
-            "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+          $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test 2>$null
+          if (-not $branchExists) {
+           "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
             echo "branch_exists=false" >> $env:GITHUB_ENV
+          } else {
+             "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+              echo "branch_exists=true" >> $env:GITHUB_ENV
           }
+
+      # - name: Check for sa_test branch
+      #   id: check_temp_branch
+      #   run: |
+      #     git fetch origin
+      #     if (git show-ref --verify --quiet refs/remotes/origin/sa_test) {
+      #       "sa_test branch exists." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+      #       echo "branch_exists=true" >> $env:GITHUB_ENV
+      #     } else {
+      #       "sa_test branch does not exist." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+      #       echo "branch_exists=false" >> $env:GITHUB_ENV
+      #     }
 
       - name: Create or reset sa_test branch
         run: |
