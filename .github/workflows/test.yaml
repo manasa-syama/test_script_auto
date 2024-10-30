@@ -83,10 +83,11 @@ jobs:
               git merge --abort
             } else {
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
+              exit 1
             }
            
           }
-          exit 1
+          
 
       - name: Merge Operation on target1  
         id: merge_operation_target1
