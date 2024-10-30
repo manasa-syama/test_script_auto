@@ -44,7 +44,8 @@ jobs:
           git fetch origin
 
           # Attempt to check if the sa_test branch exists
-          git show-ref --verify --quiet refs/remotes/origin/sa_test
+           $branchExists = git show-ref --verify --quiet refs/remotes/origin/sa_test
+           echo " Status of above command:$LASTEXITCODE"
 
           if ($LASTEXITCODE -eq 0) {
           # If the branch exists
