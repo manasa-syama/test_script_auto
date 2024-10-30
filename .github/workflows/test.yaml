@@ -86,7 +86,7 @@ jobs:
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
               
             }
-            exit 1
+            throw "Aborting the workflow due to an error during merge."
           }
           
 
