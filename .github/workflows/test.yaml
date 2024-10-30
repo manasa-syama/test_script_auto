@@ -81,9 +81,10 @@ jobs:
             if ($output -like "*CONFLICT*") {
               "Merge conflicts detected. Please resolve them." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
               git merge --abort
+              exit 1
             } else {
               "An error occurred during the merge (not a conflict)." | Out-File ${{ steps.setup_log.outputs.log_file }} -Append
-              exit 1
+              
             }
            
           }
