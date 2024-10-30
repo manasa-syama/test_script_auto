@@ -57,6 +57,7 @@ jobs:
         id: merge_operation_sa_test
         run: |
           git checkout sa_test
+          git fetch origin sa_test
           # Merge operation using a subshell
           if output=$(git merge origin/source1 2>&1); then
             echo "Merge successful!"
